@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Flappy Remix</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">🪽</div>
+        <div class="title">
+          <div class="name">Flappy Remix</div>
+          <div class="tag">A clean HTML5 arcade run</div>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button id="btnSettings" class="btn ghost" type="button">Settings</button>
+        <button id="btnStats" class="btn ghost" type="button">Stats</button>
+      </div>
+    </header>
+
+    <main class="stage">
+      <canvas id="game" width="360" height="640" aria-label="Game canvas"></canvas>
+
+      <!-- HUD -->
+      <div id="hud" class="hud" aria-hidden="true">
+        <div class="hud-left">
+          <div class="chip" id="chipMode">Mode: Classic</div>
+          <div class="chip" id="chipTheme">Theme: Day</div>
+        </div>
+        <div class="hud-score" id="hudScore">0</div>
+        <div class="hud-right">
+          <div class="chip" id="chipMission">Mission: —</div>
+        </div>
+      </div>
+
+      <!-- Overlay: Home -->
+      <section id="overlayHome" class="overlay visible" role="dialog" aria-modal="true">
+        <div class="card">
+          <h1 class="h1">Flappy Remix</h1>
+          <p class="p">Tap / Click / Space to flap. Keep it clean. Keep it calm.</p>
+
+          <div class="home-metrics">
+            <div class="metric">
+              <div class="metric-label">Best</div>
+              <div class="metric-value" id="homeBest">0</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Total Runs</div>
+              <div class="metric-value" id="homeRuns">0</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Total Score</div>
+              <div class="metric-value" id="homeTotalScore">0</div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button id="btnPlay" class="btn primary" type="button">Play</button>
+            <button id="btnPractice" class="btn" type="button">Practice</button>
+          </div>
+
+          <div class="sub-actions">
+            <button id="btnQuickRestart" class="btn ghost" type="button" title="Instant start">Instant Start</button>
+          </div>
+
+          <div class="hint">Tip: You can pause with <span class="kbd">P</span> or <span class="kbd">Esc</span>.</div>
+        </div>
+      </section>
+
+      <!-- Overlay: Ready -->
+      <section id="overlayReady" class="overlay" role="dialog" aria-modal="true">
+        <div class="card compact">
+          <div class="big">Tap to Start</div>
+          <div class="small">Mode and mission are set. Good luck.</div>
+        </div>
+      </section>
+
+      <!-- Overlay: Pause -->
+      <section id="overlayPause" class="overlay" role="dialog" aria-modal="true">
+        <div class="card">
+          <h2 class="h2">Paused</h2>
+          <div class="actions">
+            <button id="btnResume" class="btn primary" type="button">Resume</button>
+            <button id="btnRestart" class="btn" type="button">Restart</button>
+            <button id="btnQuit" class="btn ghost" type="button">Quit</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Overlay: Result -->
+      <section id="overlayResult" class="overlay" role="dialog" aria-modal="true">
+        <div class="card">
+          <h2 class="h2">Run Complete</h2>
+
+          <div class="result-grid">
+            <div class="result-item">
+              <div class="result-label">Score</div>
+              <div class="result-value" id="resultScore">0</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Best</div>
+              <div class="result-value" id="resultBest">0</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Coins</div>
+              <div class="result-value" id="resultCoins">0</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Mission</div>
+              <div class="result-value" id="resultMission">—</div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button id="btnRetry" class="btn primary" type="button">Retry</button>
+            <button id="btnBackHome" class="btn ghost" type="button">Home</button>
+          </div>
+
+          <div class="hint" id="resultHint">“One more run.”</div>
+        </div>
+      </section>
+
+      <!-- Modal: Settings -->
+      <section id="modalSettings" class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+        <div class="modal-card">
+          <div class="modal-head">
+            <div class="modal-title" id="settingsTitle">Settings</div>
+            <button id="btnCloseSettings" class="btn ghost" type="button">Close</button>
+          </div>
+
+          <div class="form">
+            <label class="row">
+              <span>Sound</span>
+              <input id="setSound" type="checkbox" />
+            </label>
+            <label class="row">
+              <span>Music</span>
+              <input id="setMusic" type="checkbox" />
+            </label>
+            <label class="row">
+              <span>Vibration</span>
+              <input id="setVibration" type="checkbox" />
+            </label>
+            <label class="row">
+              <span>Reduced Motion</span>
+              <input id="setReducedMotion" type="checkbox" />
+            </label>
+            <label class="row">
+              <span>High Contrast</span>
+              <input id="setHighContrast" type="checkbox" />
+            </label>
+
+            <div class="row split">
+              <span>Input</span>
+              <select id="setInput">
+                <option value="tap">Tap / Click</option>
+                <option value="hold">Hold to glide (easy)</option>
+              </select>
+            </div>
+
+            <div class="row split">
+              <span>Difficulty Curve</span>
+              <select id="setDifficulty">
+                <option value="normal">Normal</option>
+                <option value="soft">Soft (newbie)</option>
+                <option value="hard">Hard</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Modal: Stats -->
+      <section id="modalStats" class="modal" role="dialog" aria-modal="true" aria-labelledby="statsTitle">
+        <div class="modal-card">
+          <div class="modal-head">
+            <div class="modal-title" id="statsTitle">Stats</div>
+            <button id="btnCloseStats" class="btn ghost" type="button">Close</button>
+          </div>
+          <div class="stats-grid">
+            <div class="stat">
+              <div class="k">Best Score</div>
+              <div class="v" id="statBest">0</div>
+            </div>
+            <div class="stat">
+              <div class="k">Total Runs</div>
+              <div class="v" id="statRuns">0</div>
+            </div>
+            <div class="stat">
+              <div class="k">Total Score</div>
+              <div class="v" id="statTotalScore">0</div>
+            </div>
+            <div class="stat">
+              <div class="k">Total Coins</div>
+              <div class="v" id="statCoins">0</div>
+            </div>
+            <div class="stat">
+              <div class="k">Longest Streak (Score)</div>
+              <div class="v" id="statStreak">0</div>
+            </div>
+          </div>
+
+          <div class="danger-zone">
+            <button id="btnResetData" class="btn danger" type="button">Reset Local Data</button>
+            <div class="hint small">This only clears data in your browser.</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="foot-left">Tip: Press <span class="kbd">Space</span> to flap.</div>
+      <div class="foot-right">v1.0 • HTML5 Canvas</div>
+    </footer>
+  </div>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
