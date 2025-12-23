@@ -283,3 +283,17 @@ canvas{
   .result-grid{grid-template-columns: 1fr;}
   .stats-grid{grid-template-columns: 1fr;}
 }
+
+/* ===== Disable text selection for game overlays ===== */
+.overlay,
+.overlay * {
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+/* ===== Touch behavior tuning ===== */
+canvas,
+.overlay {
+  touch-action: manipulation;
+}

@@ -169,49 +169,64 @@ export class Game {
         this.startRun({ practice: false, instant: false });
         return;
       }
+
       if (this.sm.is("ready")) {
         this.sm.set("playing");
         return;
       }
+
       if (this.sm.is("playing")) {
         this.flap();
         return;
       }
+
       if (this.sm.is("result")) {
         await this.audio.unlock();
         this.startRun({ practice: this.practice, instant: true });
       }
     };
 
-    // Canvas click/tap
+    /* ===== Canvas interaction ===== */
     this.canvas.addEventListener("pointerdown", (e) => {
       e.preventDefault();
       onFlap();
     });
 
-    // Keyboard
+    /* ===== READY overlay (Tap to Start) ===== */
+    this.ui.overlayReady.addEventListener("pointerdown", async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (this.sm.is("ready")) {
+        await this.audio.unlock();
+        this.sm.set("playing");
+      }
+    });
+
+    /* ===== Keyboard ===== */
     window.addEventListener("keydown", (e) => {
-      if (e.code === "Space") { e.preventDefault(); onFlap(); }
+      if (e.code === "Space") {
+        e.preventDefault();
+        onFlap();
+      }
+
       if (e.code === "KeyP" || e.code === "Escape") {
         if (this.sm.is("playing")) this.pause();
         else if (this.sm.is("paused")) this.resume();
       }
+
       if (e.code === "KeyR") {
-        if (this.sm.is("playing") || this.sm.is("paused") || this.sm.is("result")) this.restart();
+        if (
+          this.sm.is("playing") ||
+          this.sm.is("paused") ||
+          this.sm.is("result")
+        ) {
+          this.restart();
+        }
       }
     });
-
-    // Optional: hold mode (easy)
-    window.addEventListener("pointermove", () => {
-      const s = this.storage.getSettings();
-      if (!this.sm.is("playing")) return;
-      if (s.input !== "hold") return;
-    });
-
-    window.addEventListener("pointerup", () => {
-      // reserved
-    });
   }
+
 
   _wireVisibility() {
     document.addEventListener("visibilitychange", () => {
